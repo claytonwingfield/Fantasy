@@ -1,75 +1,189 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Image } from "expo-image";
+import { useRouter } from "expo-router";
+import LottieView from "lottie-react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import { useEffect } from "react";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { useAuth } from "@/contexts/AuthContext";
 
-export default function HomeScreen() {
+export default function WelcomeScreen() {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  // Redirect if user is already authenticated
+  useEffect(() => {
+    if (!loading && user) {
+      // User is authenticated, redirect to main app
+      router.replace("/(tabs)");
+    }
+  }, [user, loading, router]);
+
+  const handleSignUp = () => {
+    router.push("/auth/signup");
+  };
+
+  const handleSignIn = () => {
+    router.push("/auth/signin");
+  };
+
+  // Show loading while checking auth status
+  if (loading) {
+    return (
+      <ThemedView style={styles.container}>
+        <ThemedText style={styles.loadingText}>Loading...</ThemedText>
+      </ThemedView>
+    );
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
+    <ThemedView style={styles.container}>
+      <ThemedView style={styles.header}>
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+          source={require("@/assets/images/icon.png")}
+          style={styles.logo}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
+        <ThemedText type="title" style={styles.title}>
+          Fantasy Betting
+        </ThemedText>
+        <ThemedText type="subtitle" style={styles.subtitle}>
+          League Betting App
+        </ThemedText>
+        <ThemedText style={styles.description}>
+          Join the ultimate fantasy football experience with real money betting
         </ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+
+      <ThemedView style={styles.animationContainer}>
+        <LottieView
+          source={require("@/assets/lotti/football.json")}
+          autoPlay
+          loop
+          style={styles.lottieAnimation}
+        />
+      </ThemedView>
+
+      <ThemedView style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.primaryButton} onPress={handleSignUp}>
+          <ThemedText style={styles.primaryButtonText}>
+            Create Account
+          </ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.secondaryButton} onPress={handleSignIn}>
+          <ThemedText style={styles.secondaryButtonText}>Sign In</ThemedText>
+        </TouchableOpacity>
+      </ThemedView>
+
+      <ThemedView style={styles.footer}>
+        <ThemedText style={styles.footerText}>
+          By continuing, you agree to our Terms of Service and Privacy Policy
         </ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: "#0B1426",
+    paddingHorizontal: 24,
+    paddingTop: 60,
   },
-  stepContainer: {
-    gap: 8,
+  header: {
+    alignItems: "center",
+    marginBottom: 60,
+    marginTop: 40,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 24,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    textAlign: "center",
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  subtitle: {
+    fontSize: 20,
+    color: "#FFD700",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  description: {
+    fontSize: 16,
+    color: "#B0B3B8",
+    textAlign: "center",
+    lineHeight: 24,
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  animationContainer: {
+    alignItems: "center",
+    marginVertical: 20,
+    marginBottom: 20,
+  },
+  lottieAnimation: {
+    width: 200,
+    height: 100,
+  },
+  buttonContainer: {
+    gap: 16,
+    marginBottom: 40,
+  },
+  primaryButton: {
+    backgroundColor: "#FFD700",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    alignItems: "center",
+    shadowColor: "#FFD700",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  primaryButtonText: {
+    color: "#0B1426",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  secondaryButton: {
+    backgroundColor: "transparent",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#FFD700",
+  },
+  secondaryButtonText: {
+    color: "#FFD700",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  footer: {
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  footerText: {
+    fontSize: 12,
+    color: "#6B7280",
+    textAlign: "center",
+    lineHeight: 18,
+  },
+  loadingText: {
+    fontSize: 18,
+    color: "#FFFFFF",
+    textAlign: "center",
+    marginTop: 100,
   },
 });
